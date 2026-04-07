@@ -17,6 +17,7 @@ from pydantic import BeforeValidator, Field
 import shutil
 
 CODEX_BINARY = os.environ.get("CODEX_BINARY", "codex")
+CODEX_USE_DOUBLE_DASH = os.environ.get("CODEX_USE_DOUBLE_DASH", "true").lower() == "true"
 
 mcp = FastMCP("Codex MCP Server-from guda.studio")
 
@@ -219,7 +220,10 @@ async def codex(
         PROMPT = windows_escape(PROMPT)
     else:
         PROMPT = PROMPT
-    cmd += ['--', PROMPT]
+    if CODEX_USE_DOUBLE_DASH:
+        cmd += ['--', PROMPT]
+    else:
+        cmd.append(PROMPT)
 
     all_messages: list[Dict[str, Any]] = []
     agent_messages = ""
