@@ -16,6 +16,8 @@ from mcp.server.fastmcp import FastMCP
 from pydantic import BeforeValidator, Field
 import shutil
 
+CODEX_BINARY = os.environ.get("CODEX_BINARY", "codex")
+
 mcp = FastMCP("Codex MCP Server-from guda.studio")
 
 
@@ -38,7 +40,7 @@ def run_shell_command(cmd: list[str]) -> Generator[str, None, None]:
     # On Windows, codex is exposed via a *.cmd shim. Use cmd.exe with /s so
     # user prompts containing quotes/newlines aren't reinterpreted as shell syntax.
     popen_cmd = cmd.copy()
-    codex_path = shutil.which('codex') or cmd[0]
+    codex_path = shutil.which(CODEX_BINARY) or cmd[0]
     popen_cmd[0] = codex_path
 
     process = subprocess.Popen(
@@ -193,7 +195,7 @@ async def codex(
 ) -> Dict[str, Any]:
     """Execute a Codex CLI session and return the results."""
     # Build command as list to avoid injection
-    cmd = ["codex", "exec", "--sandbox", sandbox, "--cd", str(cd), "--json"]
+    cmd = [CODEX_BINARY, "exec", "--sandbox", sandbox, "--cd", str(cd), "--json"]
     
     if len(image):
         cmd.extend(["--image", ",".join(image)])
